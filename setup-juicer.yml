@@ -38,20 +38,26 @@
       shell: echo "export PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> /etc/profile
 
     - name: Get OPA source
-      shell: go get github.com/open-policy-agent/opa
+      shell: |
+        [ -d "$(go env GOPATH)/src/github.com/open-policy-agent/opa" ] || go get github.com/open-policy-agent/opa
 
     - name: Get benchstat
       shell: go get golang.org/x/perf/cmd/benchstat
     - name: Install benchstat
       shell: go install golang.org/x/perf/cmd/benchstat
 
-    - name: Setup OPA branches
-      shell: git branch juicer -f && git checkout master
+    - name: Init OPA branches
+      shell: git checkout -f master && git branch -f juicer && git branch -f remote/juicer
       args:
         chdir: /root/go/src/github.com/open-policy-agent/opa
 
-    - name: Copy do-bench-local.sh
+    - name: Copy bench.sh
       copy:
         src: "{{ playbook_dir }}/bench.sh"
         dest: /root/bench.sh
+        mode: "0755"
+    - name: Copy test.sh
+      copy:
+        src: "{{ playbook_dir }}/test.sh"
+        dest: /root/test.sh
         mode: "0755"

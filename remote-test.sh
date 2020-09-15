@@ -13,4 +13,4 @@ trap "cd ${PREV_DIR}" EXIT
 
 git push -f ssh://root@${JUICER}/root/go/src/github.com/open-policy-agent/opa HEAD:remote/juicer
 
-ssh root@${JUICER} TESTS=${TESTS} REGEX=${REGEX} CPU=${CPU} COUNT=${COUNT} /root/bench.sh
+ssh root@${JUICER} TESTS=${TESTS} /root/test.sh

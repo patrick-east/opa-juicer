@@ -1,0 +1,56 @@
+---
+- hosts: all
+  remote_user: root
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/go/bin:/root/go/bin"
+
+  tasks:
+    - name: Update all packages to the latest version
+      apt:
+        upgrade: dist
+        update_cache: yes
+
+    - name: Install wget
+      apt:
+        name: wget
+        state: present
+
+    - name: Install build-essential
+      apt:
+        name: build-essential
+        state: present
+
+    - name: Install git
+      apt:
+        name: git
+        state: present
+
+    - name: Download golang
+      get_url:
+        url: https://dl.google.com/go/go1.14.9.linux-amd64.tar.gz
+        dest: /root/go.tar.gz
+    - name: Install golang
+      unarchive:
+        src: /root/go.tar.gz
+        dest: /usr/local
+        remote_src: yes
+    - name: Add go to path
+      shell: echo "export PATH=$PATH:/usr/local/go/bin:/root/go/bin" >> /etc/profile
+
+    - name: Get OPA source
+      shell: go get github.com/open-policy-agent/opa
+
+    - name: Get benchstat
+      shell: go get golang.org/x/perf/cmd/benchstat
+    - name: Install benchstat
+      shell: go install golang.org/x/perf/cmd/benchstat
+
+    - name: Setup OPA branches
+      shell: git branch juicer -f && git checkout master
+      args:
+        chdir: /root/go/src/github.com/open-policy-agent/opa
+
+    - name: Copy do-bench-local.sh
+      copy:
+        src: "{{ playbook_dir }}/bench.sh"
+        dest: /root/bench.sh

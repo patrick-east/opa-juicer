@@ -54,3 +54,4 @@
       copy:
         src: "{{ playbook_dir }}/bench.sh"
         dest: /root/bench.sh
+        mode: "0755"
